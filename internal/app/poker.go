@@ -7,11 +7,6 @@ import (
 	"github.com/JuanObandoDeveloper/poker/internal/models"
 )
 
-var (
-	Ranks = []models.Rank{models.Two, models.Three, models.Four, models.Five, models.Six, models.Seven, models.Eight, models.Nine, models.Ten, models.Jack, models.Queen, models.King, models.Ace}
-	suits = []models.Suit{models.Spades, models.Hearts, models.Diamonds, models.Clubs}
-)
-
 type Poker struct {
 	Deck []models.Card
 }
@@ -21,8 +16,8 @@ func NewPoker() *Poker {
 }
 
 func (p *Poker) Insert() {
-	for _, suit := range suits {
-		for _, rank := range Ranks {
+	for _, suit := range models.Suits {
+		for _, rank := range models.Ranks {
 			p.Deck = append(p.Deck, models.Card{Rank: rank, Suit: suit})
 		}
 	}

@@ -1,57 +1,35 @@
 package app
 
 import (
-	"math/rand"
-	"time"
-
 	"github.com/JuanObandoDeveloper/poker/internal/models"
 )
 
 type Poker struct {
-	Deck []models.Card
+	mainDeck   *models.Deck
+	PlayerDeck *models.Deck
 }
 
 func NewPoker() *Poker {
-	return &Poker{}
+	poker := new(Poker)
+	poker.mainDeck = models.NewMainDeck()
+	poker.mainDeck.Shuffle()
+	poker.PlayerDeck = new(models.Deck)
+	return poker
 }
 
-func (p *Poker) Insert() {
-	for _, suit := range models.Suits {
-		for _, rank := range models.Ranks {
-			p.Deck = append(p.Deck, models.Card{Rank: rank, Suit: suit})
-		}
-	}
+func (p *Poker) Distribute() {
+	p.PlayerDeck = p.mainDeck.DealDeck(5)
 }
 
-func (p *Poker) Shuffle() {
-	rand.NewSource(time.Now().UnixNano())
-	rand.Shuffle(len(p.Deck), func(i, j int) { p.Deck[i], p.Deck[j] = p.Deck[j], p.Deck[i] })
+func (p *Poker) DiscardDeck(deckToDiscard *models.Deck) {
+	p.PlayerDeck.RemoveDeck(deckToDiscard)
+	p.PlayerDeck.AddDeck(p.mainDeck.DealDeck(uint8(len(*deckToDiscard))))
 }
 
-func (p *Poker) Distribute() []models.Card {
-	prevCards := []models.Card{}
-	for i := 0; i < 5; i++ {
-		card := p.GetCard()
-		prevCards = append(prevCards, card)
-	}
-	return prevCards
-}
-
-func (p *Poker) GetCard() models.Card {
-	index := p.RandomNum()
-	card := p.Deck[index]
-	p.Deck = append(p.Deck[:index], p.Deck[index+1:]...)
-	return card
-}
-
-func (p *Poker) RandomNum() int {
-	return rand.Intn(len(p.Deck))
-}
-
-func IsRoyalFlush(hand []models.Card) bool {
-	for i := 0; i < len(hand)-4; i++ {
-		if hand[i].Rank == models.Ten && hand[i+1].Rank == models.Jack && hand[i+2].Rank == models.Queen && hand[i+3].Rank == models.King && hand[i+4].Rank == models.Ace {
-			if IsFlush(hand) {
+func (p *Poker) IsRoyalFlush() bool {
+	for i := 0; i < len(*p.PlayerDeck)-4; i++ {
+		if (*p.PlayerDeck)[i].Rank == models.Ten && (*p.PlayerDeck)[i+1].Rank == models.Jack && (*p.PlayerDeck)[i+2].Rank == models.Queen && (*p.PlayerDeck)[i+3].Rank == models.King && (*p.PlayerDeck)[i+4].Rank == models.Ace {
+			if p.IsFlush() {
 				return true
 			}
 		}
@@ -59,27 +37,27 @@ func IsRoyalFlush(hand []models.Card) bool {
 	return false
 }
 
-func IsStraightFlush(hand []models.Card) bool {
-	if IsFlush(hand) && IsStraight(hand) {
+func (p *Poker) IsStraightFlush() bool {
+	if p.IsFlush() && p.IsStraight() {
 		return true
 	}
 	return false
 }
 
-func IsPoker(hand []models.Card) bool {
-	for i := 0; i < len(hand)-3; i++ {
-		if hand[i].Rank == hand[i+1].Rank && hand[i+1].Rank == hand[i+2].Rank && hand[i+2].Rank == hand[i+3].Rank {
+func (p *Poker) IsPoker() bool {
+	for i := 0; i < len(*p.PlayerDeck)-3; i++ {
+		if (*p.PlayerDeck)[i].Rank == (*p.PlayerDeck)[i+1].Rank && (*p.PlayerDeck)[i+1].Rank == (*p.PlayerDeck)[i+2].Rank && (*p.PlayerDeck)[i+2].Rank == (*p.PlayerDeck)[i+3].Rank {
 			return true
 		}
 	}
 	return false
 }
 
-func IsFullHouse(hand []models.Card) bool {
-	for i := 0; i < len(hand)-2; i++ {
-		if hand[i].Rank == hand[i+1].Rank && hand[i+1].Rank == hand[i+2].Rank {
-			for j := i + 3; j < len(hand)-1; j++ {
-				if hand[j].Rank == hand[j+1].Rank {
+func (p *Poker) IsFullHouse() bool {
+	for i := 0; i < len(*p.PlayerDeck)-2; i++ {
+		if (*p.PlayerDeck)[i].Rank == (*p.PlayerDeck)[i+1].Rank && (*p.PlayerDeck)[i+1].Rank == (*p.PlayerDeck)[i+2].Rank {
+			for j := i + 3; j < len((*p.PlayerDeck))-1; j++ {
+				if (*p.PlayerDeck)[j].Rank == (*p.PlayerDeck)[j+1].Rank {
 					return true
 				}
 			}
@@ -88,9 +66,9 @@ func IsFullHouse(hand []models.Card) bool {
 	return false
 }
 
-func IsFlush(hand []models.Card) bool {
-	suit := hand[0].Suit
-	for _, card := range hand {
+func (p *Poker) IsFlush() bool {
+	suit := (*p.PlayerDeck)[0].Suit
+	for _, card := range *p.PlayerDeck {
 		if card.Suit != suit {
 			return false
 		}
@@ -98,29 +76,29 @@ func IsFlush(hand []models.Card) bool {
 	return true
 }
 
-func IsStraight(hand []models.Card) bool {
-	for i := 0; i < len(hand)-1; i++ {
-		if hand[i].Rank+1 != hand[i+1].Rank {
+func (p *Poker) IsStraight() bool {
+	for i := 0; i < len((*p.PlayerDeck))-1; i++ {
+		if (*p.PlayerDeck)[i].Rank+1 != (*p.PlayerDeck)[i+1].Rank {
 			return false
 		}
 	}
 	return true
 }
 
-func IsThreeOfAKind(hand []models.Card) bool {
-	for i := 0; i < len(hand)-2; i++ {
-		if hand[i].Rank == hand[i+1].Rank && hand[i].Rank == hand[i+2].Rank {
+func (p *Poker) IsThreeOfAKind() bool {
+	for i := 0; i < len(*p.PlayerDeck)-2; i++ {
+		if (*p.PlayerDeck)[i].Rank == (*p.PlayerDeck)[i+1].Rank && (*p.PlayerDeck)[i].Rank == (*p.PlayerDeck)[i+2].Rank {
 			return true
 		}
 	}
 	return false
 }
 
-func IsTwoPair(hand []models.Card) bool {
-	for i := 0; i < len(hand)-1; i++ {
-		if hand[i].Rank == hand[i+1].Rank {
-			for j := i + 2; j < len(hand)-1; j++ {
-				if hand[j].Rank == hand[j+1].Rank {
+func (p *Poker) IsTwoPair() bool {
+	for i := 0; i < len(*p.PlayerDeck)-1; i++ {
+		if (*p.PlayerDeck)[i].Rank == (*p.PlayerDeck)[i+1].Rank {
+			for j := i + 2; j < len((*p.PlayerDeck))-1; j++ {
+				if (*p.PlayerDeck)[j].Rank == (*p.PlayerDeck)[j+1].Rank {
 					return true
 				}
 			}
@@ -129,16 +107,40 @@ func IsTwoPair(hand []models.Card) bool {
 	return false
 }
 
-func IsOnePair(hand []models.Card) bool {
-	for i := 0; i < len(hand)-1; i++ {
-		if hand[i].Rank == hand[i+1].Rank {
-			if (hand[i].Rank == models.Jack && hand[i+1].Rank == models.Jack) ||
-				(hand[i].Rank == models.Queen && hand[i+1].Rank == models.Queen) ||
-				(hand[i].Rank == models.King && hand[i+1].Rank == models.King) ||
-				(hand[i].Rank == models.Ace && hand[i+1].Rank == models.Ace) {
+func (p *Poker) IsOnePair() bool {
+	for i := 0; i < len(*p.PlayerDeck)-1; i++ {
+		if (*p.PlayerDeck)[i].Rank == (*p.PlayerDeck)[i+1].Rank {
+			if ((*p.PlayerDeck)[i].Rank == models.Jack && (*p.PlayerDeck)[i+1].Rank == models.Jack) ||
+				((*p.PlayerDeck)[i].Rank == models.Queen && (*p.PlayerDeck)[i+1].Rank == models.Queen) ||
+				((*p.PlayerDeck)[i].Rank == models.King && (*p.PlayerDeck)[i+1].Rank == models.King) ||
+				((*p.PlayerDeck)[i].Rank == models.Ace && (*p.PlayerDeck)[i+1].Rank == models.Ace) {
 				return true
 			}
 		}
+	}
+	return false
+}
+
+func (p *Poker) Validate() bool {
+	p.PlayerDeck.Sort()
+	if p.IsRoyalFlush() {
+		return true
+	} else if p.IsStraightFlush() {
+		return true
+	} else if p.IsPoker() {
+		return true
+	} else if p.IsFullHouse() {
+		return true
+	} else if p.IsFlush() {
+		return true
+	} else if p.IsStraight() {
+		return true
+	} else if p.IsThreeOfAKind() {
+		return true
+	} else if p.IsTwoPair() {
+		return true
+	} else if p.IsOnePair() {
+		return true
 	}
 	return false
 }

@@ -1,7 +1,7 @@
 package models
 
 type Suit int
-type Value int
+type Rank int
 
 const (
 	Spades Suit = iota
@@ -11,7 +11,7 @@ const (
 )
 
 const (
-	Two Value = iota
+	Two Rank = iota
 	Three
 	Four
 	Five
@@ -41,7 +41,7 @@ func (s Suit) String() string {
 	}
 }
 
-func (v Value) String() string {
+func (v Rank) String() string {
 	switch v {
 	case Two:
 		return "2"
@@ -75,10 +75,10 @@ func (v Value) String() string {
 }
 
 type Card struct {
-	Suit  Suit
-	Value Value
+	Suit
+	Rank
 }
 
 func (c Card) String() string {
-	return c.Value.String() + c.Suit.String()
+	return c.Rank.String() + c.Suit.String()
 }

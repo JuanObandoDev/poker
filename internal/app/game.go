@@ -36,7 +36,7 @@ func KeepOrDiscard(hand []models.Card, deck Poker) []models.Card {
 
 func Sort(hand []models.Card) []models.Card {
 	sort.Slice(hand, func(i, j int) bool {
-		return hand[i].Value < hand[j].Value
+		return hand[i].Rank < hand[j].Rank
 	})
 	return hand
 }

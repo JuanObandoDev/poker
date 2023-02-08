@@ -29,7 +29,7 @@ func (p *Poker) Insert() {
 }
 
 func (p *Poker) Shuffle() {
-	rand.Seed(time.Now().UnixNano())
+	rand.NewSource(time.Now().UnixNano())
 	rand.Shuffle(len(p.Deck), func(i, j int) { p.Deck[i], p.Deck[j] = p.Deck[j], p.Deck[i] })
 }
 

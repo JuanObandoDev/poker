@@ -125,21 +125,29 @@ func (p *Poker) Validate() bool {
 	p.PlayerDeck.Sort()
 	if p.IsRoyalFlush() {
 		return true
-	} else if p.IsStraightFlush() {
+	}
+	if p.IsStraightFlush() {
 		return true
-	} else if p.IsPoker() {
+	}
+	if p.IsPoker() {
 		return true
-	} else if p.IsFullHouse() {
+	}
+	if p.IsFullHouse() {
 		return true
-	} else if p.IsFlush() {
+	}
+	if p.IsFlush() {
 		return true
-	} else if p.IsStraight() {
+	}
+	if p.IsStraight() {
 		return true
-	} else if p.IsThreeOfAKind() {
+	}
+	if p.IsThreeOfAKind() {
 		return true
-	} else if p.IsTwoPair() {
+	}
+	if p.IsTwoPair() {
 		return true
-	} else if p.IsOnePair() {
+	}
+	if p.IsOnePair() {
 		return true
 	}
 	return false

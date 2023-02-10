@@ -16,10 +16,11 @@ func main() {
 
 	fmt.Println("your deck:", poker.PlayerDeck)
 
-	fmt.Println("if you want to discard some cards, enter the index of the cards separated by spaces (e.g. 1 2 3 4 5) or enter to continue")
-	indexes := indexesToDiscard()
+	fmt.Println("if you want to keep some cards, enter the index of the cards separated by spaces (e.g. 1 2 3 4 5) or enter to discard all cards")
+	indexes := indexesToKeep()
+	indexesToDiscard := keepToDiscard(indexes)
 
-	deckToDiscard := poker.PlayerDeck.Deck(indexes...)
+	deckToDiscard := poker.PlayerDeck.Deck(indexesToDiscard...)
 	poker.DiscardDeck(deckToDiscard)
 
 	fmt.Println("your deck:", poker.PlayerDeck)
@@ -32,11 +33,23 @@ func main() {
 	}
 }
 
-func indexesToDiscard() []uint8 {
+func indexesToKeep() []uint8 {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	indexes := numbers(scanner.Text())
 	return indexes
+}
+
+func keepToDiscard(indexes []uint8) []uint8 {
+	indexesToDiscard := []uint8{0, 1, 2, 3, 4}
+	for _, index := range indexes {
+		for i, indexToDiscard := range indexesToDiscard {
+			if index == indexToDiscard {
+				indexesToDiscard = append(indexesToDiscard[:i], indexesToDiscard[i+1:]...)
+			}
+		}
+	}
+	return indexesToDiscard
 }
 
 func numbers(s string) []uint8 {

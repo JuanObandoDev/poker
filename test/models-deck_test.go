@@ -15,9 +15,13 @@ func TestNewMainDeck(t *testing.T) {
 
 func TestShuffle(t *testing.T) {
 	deck := models.NewMainDeck()
+	firstCards := deck.Deck(0, 1, 2, 3, 4)
 	deck.Shuffle()
-	if len(*deck) != 52 {
-		t.Errorf("Expected deck length of 52, but got %v", len(*deck))
+	firstShuffledCards := deck.Deck(0, 1, 2, 3, 4)
+	for i := 0; i < 5; i++ {
+		if (*firstCards)[i] == (*firstShuffledCards)[i] {
+			t.Errorf("Expected %v to be different from %v", (*firstCards)[i], (*firstShuffledCards)[i])
+		}
 	}
 }
 
@@ -36,7 +40,7 @@ func TestAddDeck(t *testing.T) {
 	deckToDeal := deck.DealDeck(5)
 	deck.AddDeck(deckToDeal)
 	if len(*deck) != 52 {
-		t.Errorf("Expected deck length of 57, but got %v", len(*deck))
+		t.Errorf("Expected deck length of 52, but got %v", len(*deck))
 	}
 }
 
@@ -62,8 +66,12 @@ func TestDeck(t *testing.T) {
 func TestSort(t *testing.T) {
 	deck := models.NewMainDeck()
 	deck.Shuffle()
-	deck.Sort()
-	if len(*deck) != 52 {
-		t.Errorf("Expected deck length of 52, but got %v", len(*deck))
+	firstShuffledCards := deck.Deck(0, 1, 2, 3, 4)
+	unsortedCards := firstShuffledCards.Deck(0, 1, 2, 3, 4)
+	firstShuffledCards.Sort()
+	for i := 0; i < 5; i++ {
+		if (*firstShuffledCards)[i] == (*unsortedCards)[i] {
+			t.Errorf("Expected %v to be different to %v", (*firstShuffledCards)[i], (*unsortedCards)[i])
+		}
 	}
 }

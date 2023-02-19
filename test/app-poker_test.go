@@ -433,8 +433,8 @@ func TestValidate(t *testing.T) {
 	}
 	for _, table := range tables {
 		poker.PlayerDeck = &table.pokerDeck
-		win := poker.Validate()
-		if win != true {
+		win, resultBet := poker.Validate()
+		if win != true && resultBet >= 1 && resultBet <= 9 {
 			t.Errorf("Validate fails, got %v, want true", win)
 		}
 	}

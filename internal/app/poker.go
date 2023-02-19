@@ -121,34 +121,34 @@ func (p *Poker) IsOnePair() bool {
 	return false
 }
 
-func (p *Poker) Validate() bool {
+func (p *Poker) Validate() (bool, int) {
 	p.PlayerDeck.Sort()
 	if p.IsRoyalFlush() {
-		return true
+		return true, 9
 	}
 	if p.IsStraightFlush() {
-		return true
+		return true, 8
 	}
 	if p.IsPoker() {
-		return true
+		return true, 7
 	}
 	if p.IsFullHouse() {
-		return true
+		return true, 6
 	}
 	if p.IsFlush() {
-		return true
+		return true, 5
 	}
 	if p.IsStraight() {
-		return true
+		return true, 4
 	}
 	if p.IsThreeOfAKind() {
-		return true
+		return true, 3
 	}
 	if p.IsTwoPair() {
-		return true
+		return true, 2
 	}
 	if p.IsOnePair() {
-		return true
+		return true, 1
 	}
-	return false
+	return false, 0
 }
